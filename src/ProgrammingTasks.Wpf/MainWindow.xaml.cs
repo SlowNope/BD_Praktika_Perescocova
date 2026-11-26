@@ -29,14 +29,14 @@ public partial class MainWindow : Window
 
     private void FilterClick(object sender, RoutedEventArgs e)
     {
-        var (min, max) = ParseDifficultyRange();
+        if (!TryParseDifficultyRange(out var min, out var max)) return;
         var tags = TagsFilter.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         Refresh(new TaskFilter(min, max, tags));
     }
 
     private List<ProgrammingTask> CurrentTasks()
     {
-        var (min, max) = ParseDifficultyRange();
+        if (!TryParseDifficultyRange(out var min, out var max)) return [];
         var tags = TagsFilter.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         return _service.Search(new TaskFilter(min, max, tags)).ToList();
     }
@@ -54,12 +54,12 @@ public partial class MainWindow : Window
     }
     private static string Escape(string value) => $"\"{value.Replace("\"", "\"\"")}\"";
 
-    private (int? Minimum, int? Maximum) ParseDifficultyRange()
+    private bool TryParseDifficultyRange(out int? minimumValue, out int? maximumValue)
     {
         var values = DifficultyRangeText.Text.Replace('–', '-').Split('-', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (values.Length != 2 || !int.TryParse(values[0], out var minimum) || !int.TryParse(values[1], out var maximum) || minimum is < 1 or > 10 || maximum is < 1 or > 10 || minimum > maximum)
-        { MessageBox.Show("Введите диапазон сложности в формате 1–10.", "Некорректный фильтр", MessageBoxButton.OK, MessageBoxImage.Information); return (null, null); }
-        return (minimum, maximum);
+        { minimumValue = null; maximumValue = null; MessageBox.Show("Введите диапазон сложности от 1 до 10, например 3–7.", "Некорректный фильтр", MessageBoxButton.OK, MessageBoxImage.Information); return false; }
+        minimumValue = minimum; maximumValue = maximum; return true;
     }
     private void ResetClick(object sender, RoutedEventArgs e) { DifficultyRangeText.Text = "1–10"; TagsFilter.Text = ""; Refresh(); }
     private void AddClick(object sender, RoutedEventArgs e) { var editor = new TaskEditorWindow(); if (editor.ShowDialog() == true) { _service.Save(editor.Task); Refresh(); } }

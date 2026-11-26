@@ -14,7 +14,7 @@ public partial class TaskEditorWindow : Window
     }
     private void SaveClick(object sender, RoutedEventArgs e)
     {
-        if (!int.TryParse(DifficultyText.Text, out var difficulty) || difficulty is < 1 or > 10 || string.IsNullOrWhiteSpace(TitleText.Text)) { MessageBox.Show("Укажите название и сложность от 1 до 10."); return; }
+        if (!int.TryParse(DifficultyText.Text, out var difficulty) || difficulty is < 1 or > 10 || string.IsNullOrWhiteSpace(TitleText.Text) || string.IsNullOrWhiteSpace(StatementText.Text) || string.IsNullOrWhiteSpace(IdeaText.Text)) { MessageBox.Show("Заполните название, условие, идею решения и укажите сложность от 1 до 10."); return; }
         Task.Title = TitleText.Text.Trim(); Task.Statement = StatementText.Text.Trim(); Task.SolutionIdea = IdeaText.Text.Trim(); Task.Difficulty = difficulty; Task.PolygonUrl = string.IsNullOrWhiteSpace(PolygonText.Text) ? null : PolygonText.Text.Trim(); Task.Tags = TagsText.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList(); Task.Contests = ContestsText.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList(); Task.Note = NoteText.Text.Trim(); DialogResult = true;
     }
     private void CancelClick(object sender, RoutedEventArgs e) => DialogResult = false;
