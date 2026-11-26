@@ -10,12 +10,13 @@ public partial class MainWindow : Window
 {
     private readonly TaskService _service;
 
-    public MainWindow()
+    public MainWindow(AuthenticatedUser user)
     {
         InitializeComponent();
         var repository = new SqliteTaskRepository(Path.Combine(AppContext.BaseDirectory, "programming-tasks.db"));
         _service = new TaskService(repository);
-        UserLabel.Text = "Пользователь: user1 (просмотр)";
+        UserLabel.Text = $"Пользователь: {user.Login}" + (user.IsAdministrator ? " (администратор)" : " (просмотр)");
+        if (!user.IsAdministrator) AddButton.Visibility = Visibility.Collapsed;
         Refresh();
     }
 
