@@ -80,11 +80,11 @@ public partial class MainWindow : Window
     private void SwitchUserClick(object sender, RoutedEventArgs e)
     {
         ApplicationLogger.Info("AUTH: пользователь запросил смену пользователя");
-        Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        System.Windows.Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         Close();
         var login = new LoginWindow();
-        if (login.ShowDialog() == true) { var window = new MainWindow(login.User!); Application.Current.MainWindow = window; Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose; window.Show(); }
-        else Application.Current.Shutdown();
+        if (login.ShowDialog() == true) { var window = new MainWindow(login.User!); System.Windows.Application.Current.MainWindow = window; System.Windows.Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose; window.Show(); }
+        else System.Windows.Application.Current.Shutdown();
     }
 
     private sealed class TaskRow
