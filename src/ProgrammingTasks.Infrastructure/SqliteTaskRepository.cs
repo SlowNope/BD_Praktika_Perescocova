@@ -39,6 +39,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
 
     public void Save(ProgrammingTask task)
     {
+        ApplicationLogger.Info($"TASKS: {(task.Id == 0 ? "создание" : "изменение")} задачи '{task.Title}'");
         using var connection = Open();
         using var command = connection.CreateCommand();
         command.CommandText = task.Id == 0
@@ -54,6 +55,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
 
     public void Delete(int id)
     {
+        ApplicationLogger.Info($"TASKS: удаление задачи Id={id}");
         using var connection = Open(); using var command = connection.CreateCommand();
         command.CommandText = "DELETE FROM ProgrammingTasks WHERE Id=$id"; command.Parameters.AddWithValue("$id", id); command.ExecuteNonQuery();
     }
