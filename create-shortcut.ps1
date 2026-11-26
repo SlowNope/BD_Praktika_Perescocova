@@ -6,7 +6,7 @@ $shortcutPath = Join-Path $root 'ProgrammingTasks.lnk'
 $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $exe
-$shortcut.WorkingDirectory = Join-Path $root 'publish'
+$shortcut.WorkingDirectory = Join-Path $root 'publish-current'
 $shortcut.Description = 'ProgrammingTasks application'
 $shortcut.IconLocation = "$exe,0"
 $shortcut.Save()
