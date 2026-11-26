@@ -34,9 +34,10 @@ public partial class MainWindow : Window
     private void EditClick(object sender, RoutedEventArgs e) { if (TasksGrid.SelectedItem is not TaskRow row) return; var editor = new TaskEditorWindow(row.Task); if (editor.ShowDialog() == true) { _service.Save(editor.Task); Refresh(); } }
     private void DeleteClick(object sender, RoutedEventArgs e) { if (TasksGrid.SelectedItem is not TaskRow row) return; if (MessageBox.Show("Удалить выбранную задачу?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes) { _service.Delete(row.Task.Id); Refresh(); } }
 
-    private sealed class TaskRow(ProgrammingTask task)
+    private sealed class TaskRow
     {
-        public ProgrammingTask Task { get; } = task;
+        public TaskRow(ProgrammingTask task) => Task = task;
+        public ProgrammingTask Task { get; }
         public string Title => task.Title; public int Difficulty => task.Difficulty;
         public string TagsText => string.Join(", ", task.Tags); public string ContestsText => string.Join(", ", task.Contests);
         public bool PreparedForCodeforces => task.PreparedForCodeforces; public bool PreparedForYandexContest => task.PreparedForYandexContest;
