@@ -3,6 +3,7 @@ obj/
 .vs/
 packages/
 node_modules/
+publish/
 *.user
 *.suo
 *.userosscache
