@@ -38,8 +38,8 @@ public partial class MainWindow : Window
     {
         public TaskRow(ProgrammingTask task) => Task = task;
         public ProgrammingTask Task { get; }
-        public string Title => task.Title; public int Difficulty => task.Difficulty;
-        public string TagsText => string.Join(", ", task.Tags); public string ContestsText => string.Join(", ", task.Contests);
-        public bool PreparedForCodeforces => task.PreparedForCodeforces; public bool PreparedForYandexContest => task.PreparedForYandexContest;
+        public string Title => Task.Title; public int Difficulty => Task.Difficulty;
+        public string TagsText => string.Join(", ", Task.Tags); public string ContestsText => string.Join(", ", Task.Contests);
+        public bool PreparedForCodeforces => Task.PreparedForCodeforces; public bool PreparedForYandexContest => Task.PreparedForYandexContest;
     }
 }
