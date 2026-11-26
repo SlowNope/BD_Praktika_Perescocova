@@ -1,5 +1,7 @@
 using System.IO;
 using System.Windows;
+using Microsoft.Win32;
+using System.Text;
 using ProgrammingTasks.Application;
 using ProgrammingTasks.Domain.Entities;
 using ProgrammingTasks.Infrastructure;
@@ -28,6 +30,26 @@ public partial class MainWindow : Window
         var tags = TagsFilter.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         Refresh(new TaskFilter(min, max, tags));
     }
+
+    private List<ProgrammingTask> CurrentTasks()
+    {
+        int.TryParse(MinDifficulty.Text, out var min); int.TryParse(MaxDifficulty.Text, out var max);
+        var tags = TagsFilter.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return _service.Search(new TaskFilter(min, max, tags)).ToList();
+    }
+    private void ReportClick(object sender, RoutedEventArgs e)
+    {
+        var tasks = CurrentTasks(); var average = tasks.Count == 0 ? 0 : tasks.Average(task => task.Difficulty);
+        MessageBox.Show($"Задач в выборке: {tasks.Count}\nСредняя сложность: {average:F1}\nCodeforces: {tasks.Count(task => task.PreparedForCodeforces)}\nYandex Contest: {tasks.Count(task => task.PreparedForYandexContest)}", "Отчёт");
+    }
+    private void ExportClick(object sender, RoutedEventArgs e)
+    {
+        var dialog = new SaveFileDialog { Filter = "CSV (*.csv)|*.csv", FileName = "programming-tasks-report.csv" }; if (dialog.ShowDialog() != true) return;
+        var csv = new StringBuilder("Название;Сложность;Теги;Контесты;Codeforces;Yandex Contest\n");
+        foreach (var task in CurrentTasks()) csv.AppendLine($"{Escape(task.Title)};{task.Difficulty};{Escape(string.Join(", ", task.Tags))};{Escape(string.Join(", ", task.Contests))};{task.PreparedForCodeforces};{task.PreparedForYandexContest}");
+        File.WriteAllText(dialog.FileName, csv.ToString(), Encoding.UTF8); MessageBox.Show("Отчёт сохранён.", "Готово");
+    }
+    private static string Escape(string value) => $"\"{value.Replace("\"", "\"\"")}\"";
 
     private void ResetClick(object sender, RoutedEventArgs e) { MinDifficulty.Text = "1"; MaxDifficulty.Text = "10"; TagsFilter.Clear(); Refresh(); }
     private void AddClick(object sender, RoutedEventArgs e) { var editor = new TaskEditorWindow(); if (editor.ShowDialog() == true) { _service.Save(editor.Task); Refresh(); } }
