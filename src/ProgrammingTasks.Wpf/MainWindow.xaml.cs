@@ -10,7 +10,7 @@ namespace ProgrammingTasks.Wpf;
 
 public partial class MainWindow : Window
 {
-    private readonly TaskService _service;
+    private TaskService _service;
     private int _escapeCount;
 
     public MainWindow(AuthenticatedUser user)
@@ -68,6 +68,21 @@ public partial class MainWindow : Window
     private void DeleteClick(object sender, RoutedEventArgs e) { if (TasksGrid.SelectedItem is not TaskRow row) return; if (MessageBox.Show("Удалить выбранную задачу?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes) { _service.Delete(row.Task.Id); Refresh(); } }
     private void CatalogClick(object sender, RoutedEventArgs e) { var window = new CatalogWindow { Owner = this }; window.ShowDialog(); }
     private void UsersClick(object sender, RoutedEventArgs e) { var window = new UsersWindow { Owner = this }; window.ShowDialog(); }
+    private async void PostgreSqlClick(object sender, RoutedEventArgs e)
+    {
+        var window = new PostgreSqlWindow { Owner = this };
+        if (window.ShowDialog() != true || window.Settings is null) return;
+        try
+        {
+            var tasks = _service.Search(TaskFilter.Empty);
+            await new PostgreSqlMigrationService().TestAndMigrateAsync(window.Settings, tasks);
+            _service = new TaskService(new PostgreSqlTaskRepository(window.Settings));
+            Refresh();
+            ApplicationLogger.Info("POSTGRES: приложение переключено на PostgreSQL");
+            MessageBox.Show("Приложение теперь работает с PostgreSQL.", "Хранилище данных");
+        }
+        catch (Exception exception) { ApplicationLogger.Error("POSTGRES: ошибка миграции и переключения", exception); MessageBox.Show($"Миграция не выполнена:\n{exception.Message}", "PostgreSQL", MessageBoxButton.OK, MessageBoxImage.Error); }
+    }
     private void TaskDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) { if (TasksGrid.SelectedItem is TaskRow row) new TaskDetailsWindow(row.Task) { Owner = this }.ShowDialog(); }
     private void BackClick(object sender, RoutedEventArgs e) { if (MainTabs.SelectedIndex > 0) MainTabs.SelectedIndex--; }
     private void WindowPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
