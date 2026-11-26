@@ -47,7 +47,8 @@ public partial class MainWindow : Window
     }
     private void ExportClick(object sender, RoutedEventArgs e)
     {
-        var dialog = new SaveFileDialog { Filter = "CSV (*.csv)|*.csv", FileName = "programming-tasks-report.csv" }; if (dialog.ShowDialog() != true) return;
+        var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        var dialog = new SaveFileDialog { Filter = "CSV (*.csv)|*.csv", FileName = $"programming-tasks-report_{timestamp}.csv", OverwritePrompt = true }; if (dialog.ShowDialog() != true) return;
         var csv = new StringBuilder("Название;Сложность;Теги;Контесты;Codeforces;Yandex Contest\n");
         foreach (var task in CurrentTasks()) csv.AppendLine($"{Escape(task.Title)};{task.Difficulty};{Escape(string.Join(", ", task.Tags))};{Escape(string.Join(", ", task.Contests))};{task.PreparedForCodeforces};{task.PreparedForYandexContest}");
         File.WriteAllText(dialog.FileName, csv.ToString(), Encoding.UTF8); MessageBox.Show("Отчёт сохранён.", "Готово");
