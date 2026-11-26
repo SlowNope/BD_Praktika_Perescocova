@@ -1,23 +1,40 @@
-﻿using System.Text;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using ProgrammingTasks.Application;
+using ProgrammingTasks.Domain.Entities;
+using ProgrammingTasks.Infrastructure;
 
 namespace ProgrammingTasks.Wpf;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
 public partial class MainWindow : Window
 {
+    private readonly TaskService _service;
+
     public MainWindow()
     {
         InitializeComponent();
+        var repository = new SqliteTaskRepository(Path.Combine(AppContext.BaseDirectory, "programming-tasks.db"));
+        _service = new TaskService(repository);
+        UserLabel.Text = "Пользователь: user1 (просмотр)";
+        Refresh();
+    }
+
+    private void Refresh(TaskFilter? filter = null) => TasksGrid.ItemsSource = _service.Search(filter ?? TaskFilter.Empty).Select(task => new TaskRow(task)).ToList();
+
+    private void FilterClick(object sender, RoutedEventArgs e)
+    {
+        int.TryParse(MinDifficulty.Text, out var min); int.TryParse(MaxDifficulty.Text, out var max);
+        var tags = TagsFilter.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        Refresh(new TaskFilter(min, max, tags));
+    }
+
+    private void ResetClick(object sender, RoutedEventArgs e) { MinDifficulty.Text = "1"; MaxDifficulty.Text = "10"; TagsFilter.Clear(); Refresh(); }
+    private void AddClick(object sender, RoutedEventArgs e) => MessageBox.Show("Добавление доступно администратору.", "Информация");
+
+    private sealed class TaskRow(ProgrammingTask task)
+    {
+        public string Title => task.Title; public int Difficulty => task.Difficulty;
+        public string TagsText => string.Join(", ", task.Tags); public string ContestsText => string.Join(", ", task.Contests);
+        public bool PreparedForCodeforces => task.PreparedForCodeforces; public bool PreparedForYandexContest => task.PreparedForYandexContest;
     }
 }
