@@ -4,6 +4,7 @@ obj/
 packages/
 node_modules/
 publish/
+*.lnk
 *.user
 *.suo
 *.userosscache
