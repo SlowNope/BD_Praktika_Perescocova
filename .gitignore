@@ -4,6 +4,7 @@ obj/
 packages/
 node_modules/
 publish/
+publish-current/
 logs/
 *.lnk
 *.user
