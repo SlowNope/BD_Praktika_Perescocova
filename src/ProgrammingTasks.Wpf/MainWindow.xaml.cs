@@ -16,7 +16,7 @@ public partial class MainWindow : Window
         var repository = new SqliteTaskRepository(Path.Combine(AppContext.BaseDirectory, "programming-tasks.db"));
         _service = new TaskService(repository);
         UserLabel.Text = $"Пользователь: {user.Login}" + (user.IsAdministrator ? " (администратор)" : " (просмотр)");
-        if (!user.IsAdministrator) AddButton.Visibility = Visibility.Collapsed;
+        if (!user.IsAdministrator) { AddButton.Visibility = Visibility.Collapsed; EditButton.Visibility = Visibility.Collapsed; DeleteButton.Visibility = Visibility.Collapsed; }
         Refresh();
     }
 
@@ -30,10 +30,13 @@ public partial class MainWindow : Window
     }
 
     private void ResetClick(object sender, RoutedEventArgs e) { MinDifficulty.Text = "1"; MaxDifficulty.Text = "10"; TagsFilter.Clear(); Refresh(); }
-    private void AddClick(object sender, RoutedEventArgs e) => MessageBox.Show("Добавление доступно администратору.", "Информация");
+    private void AddClick(object sender, RoutedEventArgs e) { var editor = new TaskEditorWindow(); if (editor.ShowDialog() == true) { _service.Save(editor.Task); Refresh(); } }
+    private void EditClick(object sender, RoutedEventArgs e) { if (TasksGrid.SelectedItem is not TaskRow row) return; var editor = new TaskEditorWindow(row.Task); if (editor.ShowDialog() == true) { _service.Save(editor.Task); Refresh(); } }
+    private void DeleteClick(object sender, RoutedEventArgs e) { if (TasksGrid.SelectedItem is not TaskRow row) return; if (MessageBox.Show("Удалить выбранную задачу?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes) { _service.Delete(row.Task.Id); Refresh(); } }
 
     private sealed class TaskRow(ProgrammingTask task)
     {
+        public ProgrammingTask Task { get; } = task;
         public string Title => task.Title; public int Difficulty => task.Difficulty;
         public string TagsText => string.Join(", ", task.Tags); public string ContestsText => string.Join(", ", task.Contests);
         public bool PreparedForCodeforces => task.PreparedForCodeforces; public bool PreparedForYandexContest => task.PreparedForYandexContest;
