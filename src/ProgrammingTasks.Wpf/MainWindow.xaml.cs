@@ -28,14 +28,14 @@ public partial class MainWindow : Window
 
     private void FilterClick(object sender, RoutedEventArgs e)
     {
-        int.TryParse(MinDifficulty.Text, out var min); int.TryParse(MaxDifficulty.Text, out var max);
+        var (min, max) = ParseDifficultyRange();
         var tags = TagsFilter.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         Refresh(new TaskFilter(min, max, tags));
     }
 
     private List<ProgrammingTask> CurrentTasks()
     {
-        int.TryParse(MinDifficulty.Text, out var min); int.TryParse(MaxDifficulty.Text, out var max);
+        var (min, max) = ParseDifficultyRange();
         var tags = TagsFilter.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         return _service.Search(new TaskFilter(min, max, tags)).ToList();
     }
@@ -53,7 +53,14 @@ public partial class MainWindow : Window
     }
     private static string Escape(string value) => $"\"{value.Replace("\"", "\"\"")}\"";
 
-    private void ResetClick(object sender, RoutedEventArgs e) { MinDifficulty.Text = "1"; MaxDifficulty.Text = "10"; TagsFilter.Text = ""; Refresh(); }
+    private (int? Minimum, int? Maximum) ParseDifficultyRange()
+    {
+        var values = DifficultyRangeText.Text.Replace('–', '-').Split('-', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (values.Length != 2 || !int.TryParse(values[0], out var minimum) || !int.TryParse(values[1], out var maximum) || minimum is < 1 or > 10 || maximum is < 1 or > 10 || minimum > maximum)
+        { MessageBox.Show("Введите диапазон сложности в формате 1–10.", "Некорректный фильтр", MessageBoxButton.OK, MessageBoxImage.Information); return (null, null); }
+        return (minimum, maximum);
+    }
+    private void ResetClick(object sender, RoutedEventArgs e) { DifficultyRangeText.Text = "1–10"; TagsFilter.Text = ""; Refresh(); }
     private void AddClick(object sender, RoutedEventArgs e) { var editor = new TaskEditorWindow(); if (editor.ShowDialog() == true) { _service.Save(editor.Task); Refresh(); } }
     private void EditClick(object sender, RoutedEventArgs e) { if (TasksGrid.SelectedItem is not TaskRow row) return; var editor = new TaskEditorWindow(row.Task); if (editor.ShowDialog() == true) { _service.Save(editor.Task); Refresh(); } }
     private void DeleteClick(object sender, RoutedEventArgs e) { if (TasksGrid.SelectedItem is not TaskRow row) return; if (MessageBox.Show("Удалить выбранную задачу?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes) { _service.Delete(row.Task.Id); Refresh(); } }
