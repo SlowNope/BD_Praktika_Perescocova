@@ -7,7 +7,7 @@ $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $exe
 $shortcut.WorkingDirectory = Join-Path $root 'publish'
-$shortcut.Description = 'База задач по программированию'
+$shortcut.Description = 'ProgrammingTasks application'
 $shortcut.IconLocation = "$exe,0"
 $shortcut.Save()
 Write-Host "Ярлык создан: $shortcutPath"
