@@ -1,11 +1,28 @@
 using ProgrammingTasks.Application;
 using ProgrammingTasks.Domain.Entities;
 using ProgrammingTasks.Domain.Interfaces;
+using ProgrammingTasks.Infrastructure;
 
 namespace ProgrammingTasks.Tests;
 
 public sealed class TaskServiceTests
 {
+    [Fact]
+    public void Authentication_AllowsUserWithoutPassword()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"tasks-{Guid.NewGuid():N}.db");
+        try { var service = new AuthenticationService(path); Assert.NotNull(service.Authenticate("user1", string.Empty)); }
+        finally { if (File.Exists(path)) File.Delete(path); }
+    }
+
+    [Fact]
+    public void Authentication_RejectsWrongRootPassword()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"tasks-{Guid.NewGuid():N}.db");
+        try { var service = new AuthenticationService(path); Assert.Null(service.Authenticate("root", "wrong")); }
+        finally { if (File.Exists(path)) File.Delete(path); }
+    }
+
     [Fact]
     public void Search_FiltersByDifficultyAndAllSelectedTags()
     {
