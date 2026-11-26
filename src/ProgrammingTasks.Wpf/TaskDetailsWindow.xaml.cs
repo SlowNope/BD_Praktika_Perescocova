@@ -7,6 +7,7 @@ public partial class TaskDetailsWindow : Window
 {
     public TaskDetailsWindow(ProgrammingTask task)
     {
+        KeyDown += (_, args) => { if (args.Key == System.Windows.Input.Key.Escape) { args.Handled = true; Close(); } };
         InitializeComponent(); Title = task.Title; TitleText.Text = task.Title; MetaText.Text = $"Сложность: {task.Difficulty} | Теги: {string.Join(", ", task.Tags)} | Контесты: {string.Join(", ", task.Contests)}"; StatementText.Text = task.Statement; IdeaText.Text = task.SolutionIdea; PolygonText.Text = task.PolygonUrl ?? "не указана"; NoteText.Text = task.Note ?? "нет";
     }
 }

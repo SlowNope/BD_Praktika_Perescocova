@@ -7,7 +7,7 @@ namespace ProgrammingTasks.Wpf;
 public partial class LoginWindow : Window
 {
     public AuthenticatedUser? User { get; private set; }
-    public LoginWindow() { ApplicationLogger.Info("AUTH: конструктор LoginWindow"); InitializeComponent(); }
+    public LoginWindow() { KeyDown += (_, args) => { if (args.Key == System.Windows.Input.Key.Escape) { args.Handled = true; Close(); } }; ApplicationLogger.Info("AUTH: конструктор LoginWindow"); InitializeComponent(); }
     private void LoginClick(object sender, RoutedEventArgs e)
     {
         ApplicationLogger.Info($"AUTH: нажата кнопка входа, логин='{LoginText.Text.Trim()}'");

@@ -8,6 +8,7 @@ public partial class TaskEditorWindow : Window
     public ProgrammingTask Task { get; }
     public TaskEditorWindow(ProgrammingTask? task = null)
     {
+        KeyDown += (_, args) => { if (args.Key == System.Windows.Input.Key.Escape) { args.Handled = true; Close(); } };
         InitializeComponent(); Task = task is null ? new ProgrammingTask { Title = "", Statement = "", SolutionIdea = "", Difficulty = 1 } : new ProgrammingTask { Id = task.Id, Title = task.Title, Statement = task.Statement, SolutionIdea = task.SolutionIdea, PolygonUrl = task.PolygonUrl, Difficulty = task.Difficulty, Note = task.Note, PreparedForYandexContest = task.PreparedForYandexContest, Tags = [.. task.Tags], Contests = [.. task.Contests] };
         TitleText.Text = Task.Title; StatementText.Text = Task.Statement; IdeaText.Text = Task.SolutionIdea; DifficultyText.Text = Task.Difficulty.ToString(); PolygonText.Text = Task.PolygonUrl; TagsText.Text = string.Join(", ", Task.Tags); ContestsText.Text = string.Join(", ", Task.Contests); NoteText.Text = Task.Note;
     }

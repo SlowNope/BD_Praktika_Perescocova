@@ -11,6 +11,7 @@ namespace ProgrammingTasks.Wpf;
 public partial class MainWindow : Window
 {
     private readonly TaskService _service;
+    private int _escapeCount;
 
     public MainWindow(AuthenticatedUser user)
     {
@@ -67,6 +68,24 @@ public partial class MainWindow : Window
     private void CatalogClick(object sender, RoutedEventArgs e) { var window = new CatalogWindow { Owner = this }; window.ShowDialog(); }
     private void UsersClick(object sender, RoutedEventArgs e) { var window = new UsersWindow { Owner = this }; window.ShowDialog(); }
     private void TaskDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) { if (TasksGrid.SelectedItem is TaskRow row) new TaskDetailsWindow(row.Task) { Owner = this }.ShowDialog(); }
+    private void BackClick(object sender, RoutedEventArgs e) { if (MainTabs.SelectedIndex > 0) MainTabs.SelectedIndex--; }
+    private void WindowPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key != System.Windows.Input.Key.Escape) { _escapeCount = 0; return; }
+        e.Handled = true;
+        if (MainTabs.SelectedIndex > 0) { MainTabs.SelectedIndex--; _escapeCount = 0; return; }
+        _escapeCount++;
+        if (_escapeCount >= 2 && MessageBox.Show("Вы точно хотите закрыть приложение?", "Выход", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) Close();
+    }
+    private void SwitchUserClick(object sender, RoutedEventArgs e)
+    {
+        ApplicationLogger.Info("AUTH: пользователь запросил смену пользователя");
+        Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        Close();
+        var login = new LoginWindow();
+        if (login.ShowDialog() == true) { var window = new MainWindow(login.User!); Application.Current.MainWindow = window; Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose; window.Show(); }
+        else Application.Current.Shutdown();
+    }
 
     private sealed class TaskRow
     {
