@@ -2,6 +2,7 @@ using System.Globalization;
 
 namespace ProgrammingTasks.Infrastructure;
 
+/// <summary>Единый журнал диагностики приложения.</summary>
 public static class ApplicationLogger
 {
     private static readonly object SyncRoot = new();

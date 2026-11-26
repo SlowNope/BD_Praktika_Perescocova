@@ -4,8 +4,10 @@ using ProgrammingTasks.Domain.Services;
 
 namespace ProgrammingTasks.Application;
 
+/// <summary>Сервис прикладных операций над задачами.</summary>
 public sealed class TaskService(ITaskRepository repository)
 {
+    /// <summary>Возвращает задачи, соответствующие всем условиям фильтра.</summary>
     public IReadOnlyList<ProgrammingTask> Search(TaskFilter filter)
     {
         return repository.GetAll()
@@ -15,6 +17,7 @@ public sealed class TaskService(ITaskRepository repository)
             .ToList();
     }
 
+    /// <summary>Проверяет задачу и сохраняет её через выбранный репозиторий.</summary>
     public void Save(ProgrammingTask task)
     {
         if (string.IsNullOrWhiteSpace(task.Title)) throw new ArgumentException("Название задачи обязательно.");
