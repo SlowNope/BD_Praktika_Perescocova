@@ -19,7 +19,7 @@ public partial class MainWindow : Window
         var repository = new SqliteTaskRepository(Path.Combine(AppContext.BaseDirectory, "programming-tasks.db"));
         _service = new TaskService(repository);
         UserLabel.Text = $"Пользователь: {user.Login}" + (user.IsAdministrator ? " (администратор)" : " (просмотр)");
-        if (!user.IsAdministrator) { AddButton.Visibility = Visibility.Collapsed; EditButton.Visibility = Visibility.Collapsed; DeleteButton.Visibility = Visibility.Collapsed; CatalogButton.Visibility = Visibility.Collapsed; UsersButton.Visibility = Visibility.Collapsed; }
+        if (!user.IsAdministrator) { AddButton.Visibility = Visibility.Collapsed; EditButton.Visibility = Visibility.Collapsed; DeleteButton.Visibility = Visibility.Collapsed; AdminTab.Visibility = Visibility.Collapsed; }
         Refresh();
         ApplicationLogger.Info("MAIN: данные задач загружены в таблицу");
     }
@@ -67,6 +67,7 @@ public partial class MainWindow : Window
         public ProgrammingTask Task { get; }
         public string Title => Task.Title; public int Difficulty => Task.Difficulty;
         public string TagsText => string.Join(", ", Task.Tags); public string ContestsText => string.Join(", ", Task.Contests);
-        public bool PreparedForCodeforces => Task.PreparedForCodeforces; public bool PreparedForYandexContest => Task.PreparedForYandexContest;
+        public string CodeforcesStatus => Task.PreparedForCodeforces ? "Готово" : "Не готово";
+        public string YandexStatus => Task.PreparedForYandexContest ? "Готово" : "Не готово";
     }
 }
