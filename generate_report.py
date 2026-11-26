@@ -1,33 +1,49 @@
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from docx.oxml import OxmlElement
-from docx.oxml.ns import qn
 
 output = "Отчет по проекту ProgrammingTasks.docx"
 document = Document()
 styles = document.styles
-styles["Normal"].font.name = "Arial"
+styles["Normal"].font.name = "Times New Roman"
 styles["Normal"].font.size = Pt(11)
+for style_name, size in (("Heading 1", 15), ("Heading 2", 13), ("Heading 3", 12)):
+    style = styles[style_name]
+    style.font.name = "Times New Roman"
+    style.font.size = Pt(size)
+    style.font.bold = True
+    style.font.color.rgb = None
 
 title = document.add_paragraph()
 title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 run = title.add_run("ОТЧЁТ\nпо проекту ProgrammingTasks")
 run.bold = True
 run.font.size = Pt(20)
+run.font.name = "Times New Roman"
+run.font.color.rgb = None
 subtitle = document.add_paragraph()
 subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
-subtitle.add_run("База задач по программированию с фильтрацией и отчётами").italic = True
+subtitle_run = subtitle.add_run("База задач по программированию с фильтрацией и отчётами")
+subtitle_run.italic = True
+subtitle_run.font.name = "Times New Roman"
+subtitle_run.font.color.rgb = None
 
 def heading(text, level=1):
     document.add_heading(text, level=level)
 
 def paragraph(text):
-    document.add_paragraph(text)
+    p = document.add_paragraph(text)
+    for run in p.runs:
+        run.font.name = "Times New Roman"
+        run.font.color.rgb = None
+    return p
 
 def bullets(items):
     for item in items:
-        document.add_paragraph(item, style="List Bullet")
+        p = document.add_paragraph(item, style="List Bullet")
+        for run in p.runs:
+            run.font.name = "Times New Roman"
+            run.font.color.rgb = None
 
 heading("1. Назначение программы")
 paragraph("ProgrammingTasks — настольное Windows-приложение для ведения каталога задач по программированию. Оно позволяет хранить условия задач, идеи решений, сложность, теги, контесты, Polygon-ссылки и признаки подготовки к Codeforces и Yandex Contest.")
@@ -66,12 +82,17 @@ heading("10. Тестирование")
 paragraph("Команды проверки: dotnet build ProgrammingTasks.sln и dotnet test ProgrammingTasks.sln. Текущий набор содержит 5 тестов, все проходят успешно.")
 
 heading("11. Развёртывание и запуск")
-paragraph("Для автономной Windows-версии выполните publish.ps1. Self-contained приложение создаётся в publish-current. Ярлык ProgrammingTasks.lnk запускает приложение без Visual Studio и без отдельной установки .NET.")
+paragraph("Предусмотрено несколько вариантов запуска. Из Visual Studio проект удобно запускать разработчику: этот способ позволяет ставить точки останова, видеть исключения и анализировать работу кода. Команда dotnet run удобна для локальной проверки через терминал и не требует открытия интерфейса Visual Studio. Для демонстрации используется автономная self-contained публикация, собранная командой dotnet publish. Она содержит необходимые компоненты .NET и SQLite, поэтому на другом компьютере Windows не требуется отдельно устанавливать .NET SDK или настраивать сервер базы данных. Ярлык ProgrammingTasks.lnk запускает опубликованную версию двойным щелчком.")
+paragraph("Файлы проекта собирались средствами .NET CLI: dotnet restore загрузил зависимости, dotnet build выполнил сборку решения, dotnet test запустил xUnit-тесты, а dotnet publish сформировал автономную папку publish-current для Windows x64. Такой вариант удобен для защиты: приложение можно перенести на другой совместимый компьютер вместе с папкой публикации.")
 
-heading("12. Как продемонстрировать программу")
+heading("12. Формирование и сохранение отчётов")
+paragraph("В приложении отчёт строится по текущей выборке задач. Пользователь сначала задаёт диапазон сложности и теги, после чего нажимает «Отчёт» или «CSV». Для обмена выбран CSV, потому что это один из наиболее распространённых форматов табличных данных: его открывают Microsoft Excel, LibreOffice Calc, Google Таблицы, браузерные просмотрщики и обычный текстовый редактор. Формат не привязан к конкретной СУБД или программе и поэтому удобен для передачи отчёта на другой компьютер Windows.")
+paragraph("Имя файла содержит дату и время создания, например programming-tasks-report_2026-11-26_06-45-12.csv. Благодаря этому несколько отчётов можно сохранить подряд без случайного перезаписывания предыдущего файла.")
+
+heading("13. Как продемонстрировать программу")
 bullets(["Запустить ProgrammingTasks.lnk.", "Войти как user1 без пароля и показать таблицу задач.", "Ввести диапазон 3–7 и тег Графы, нажать Применить.", "Открыть задачу двойным щелчком.", "Сформировать отчёт и сохранить CSV.", "Сменить пользователя на root.", "Добавить или изменить задачу, открыть справочники и управление пользователями."])
 
-heading("13. Файлы проекта")
+heading("14. Файлы проекта")
 bullets(["REPORT.md — краткое техническое описание.", "DEMO_SCRIPT.md — сценарий демонстрации.", "init.sql — схема SQLite.", "publish.ps1 — автономная публикация.", "create-shortcut.ps1 — создание ярлыка.", "logs/application.log — журнал работы приложения."])
 
 document.save(output)
