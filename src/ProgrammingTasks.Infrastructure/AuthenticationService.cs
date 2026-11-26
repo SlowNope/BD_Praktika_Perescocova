@@ -12,7 +12,7 @@ public sealed class AuthenticationService
 
     public AuthenticationService(string databasePath)
     {
-        _connectionString = new SqliteConnectionStringBuilder { DataSource = databasePath }.ToString();
+        _connectionString = new SqliteConnectionStringBuilder { DataSource = databasePath, Pooling = false }.ToString();
         using var connection = new SqliteConnection(_connectionString); connection.Open();
         using var command = connection.CreateCommand();
         command.CommandText = "CREATE TABLE IF NOT EXISTS Users(Id INTEGER PRIMARY KEY AUTOINCREMENT, Login TEXT UNIQUE NOT NULL, PasswordHash TEXT, Role TEXT NOT NULL); INSERT OR IGNORE INTO Users(Login, PasswordHash, Role) VALUES ('root', $root, 'Administrator'); INSERT OR IGNORE INTO Users(Login, PasswordHash, Role) VALUES ('user1', NULL, 'User');";
