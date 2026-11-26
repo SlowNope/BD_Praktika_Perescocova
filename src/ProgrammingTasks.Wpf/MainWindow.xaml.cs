@@ -51,7 +51,7 @@ public partial class MainWindow : Window
     }
     private static string Escape(string value) => $"\"{value.Replace("\"", "\"\"")}\"";
 
-    private void ResetClick(object sender, RoutedEventArgs e) { MinDifficulty.Text = "1"; MaxDifficulty.Text = "10"; TagsFilter.Clear(); Refresh(); }
+    private void ResetClick(object sender, RoutedEventArgs e) { MinDifficulty.Text = "1"; MaxDifficulty.Text = "10"; TagsFilter.Text = ""; Refresh(); }
     private void AddClick(object sender, RoutedEventArgs e) { var editor = new TaskEditorWindow(); if (editor.ShowDialog() == true) { _service.Save(editor.Task); Refresh(); } }
     private void EditClick(object sender, RoutedEventArgs e) { if (TasksGrid.SelectedItem is not TaskRow row) return; var editor = new TaskEditorWindow(row.Task); if (editor.ShowDialog() == true) { _service.Save(editor.Task); Refresh(); } }
     private void DeleteClick(object sender, RoutedEventArgs e) { if (TasksGrid.SelectedItem is not TaskRow row) return; if (MessageBox.Show("Удалить выбранную задачу?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes) { _service.Delete(row.Task.Id); Refresh(); } }
