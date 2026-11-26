@@ -12,11 +12,12 @@ public sealed class AuthenticationService
 
     public AuthenticationService(string databasePath)
     {
+        ApplicationLogger.Info($"DB: инициализация авторизации, путь={databasePath}");
         _connectionString = new SqliteConnectionStringBuilder { DataSource = databasePath, Pooling = false }.ToString();
         using var connection = new SqliteConnection(_connectionString); connection.Open();
         using var command = connection.CreateCommand();
         command.CommandText = "CREATE TABLE IF NOT EXISTS Users(Id INTEGER PRIMARY KEY AUTOINCREMENT, Login TEXT UNIQUE NOT NULL, PasswordHash TEXT, Role TEXT NOT NULL); INSERT OR IGNORE INTO Users(Login, PasswordHash, Role) VALUES ('root', $root, 'Administrator'); INSERT OR IGNORE INTO Users(Login, PasswordHash, Role) VALUES ('user1', NULL, 'User');";
-        command.Parameters.AddWithValue("$root", Hash("Madmin1!")); command.ExecuteNonQuery();
+        command.Parameters.AddWithValue("$root", Hash("Madmin1!")); command.ExecuteNonQuery(); ApplicationLogger.Info("DB: таблица Users и системные пользователи готовы");
     }
 
     public AuthenticatedUser? Authenticate(string login, string password)

@@ -10,6 +10,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
 
     public SqliteTaskRepository(string databasePath)
     {
+        ApplicationLogger.Info($"DB: инициализация задач, путь={databasePath}");
         _connectionString = new SqliteConnectionStringBuilder { DataSource = databasePath }.ToString();
         Initialize();
     }
@@ -87,7 +88,8 @@ public sealed class SqliteTaskRepository : ITaskRepository
         command.CommandText = "PRAGMA foreign_keys=ON; CREATE TABLE IF NOT EXISTS ProgrammingTasks(Id INTEGER PRIMARY KEY AUTOINCREMENT, Title TEXT NOT NULL, Statement TEXT NOT NULL, SolutionIdea TEXT NOT NULL, PolygonUrl TEXT, PreparedForCodeforces INTEGER NOT NULL, PreparedForYandexContest INTEGER NOT NULL, Difficulty INTEGER NOT NULL, Note TEXT); CREATE TABLE IF NOT EXISTS Tags(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT UNIQUE NOT NULL); CREATE TABLE IF NOT EXISTS Contests(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT UNIQUE NOT NULL, Year INTEGER NOT NULL DEFAULT 2024); CREATE TABLE IF NOT EXISTS TaskTags(TaskId INTEGER NOT NULL, TagId INTEGER NOT NULL, PRIMARY KEY(TaskId,TagId), FOREIGN KEY(TaskId) REFERENCES ProgrammingTasks(Id) ON DELETE CASCADE, FOREIGN KEY(TagId) REFERENCES Tags(Id)); CREATE TABLE IF NOT EXISTS TaskContests(TaskId INTEGER NOT NULL, ContestId INTEGER NOT NULL, PRIMARY KEY(TaskId,ContestId), FOREIGN KEY(TaskId) REFERENCES ProgrammingTasks(Id) ON DELETE CASCADE, FOREIGN KEY(ContestId) REFERENCES Contests(Id));";
         command.ExecuteNonQuery();
         using var count = connection.CreateCommand(); count.CommandText = "SELECT COUNT(*) FROM ProgrammingTasks";
-        if (Convert.ToInt32(count.ExecuteScalar()) == 0) Seed();
+        if (Convert.ToInt32(count.ExecuteScalar()) == 0) { ApplicationLogger.Info("DB: демонстрационные задачи отсутствуют, начинается заполнение"); Seed(); ApplicationLogger.Info("DB: демонстрационные задачи добавлены"); }
+        else ApplicationLogger.Info("DB: существующие задачи загружены");
     }
     private void Seed()
     {

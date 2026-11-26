@@ -14,12 +14,14 @@ public partial class MainWindow : Window
 
     public MainWindow(AuthenticatedUser user)
     {
+        ApplicationLogger.Info($"MAIN: конструктор MainWindow, пользователь={user.Login}");
         InitializeComponent();
         var repository = new SqliteTaskRepository(Path.Combine(AppContext.BaseDirectory, "programming-tasks.db"));
         _service = new TaskService(repository);
         UserLabel.Text = $"Пользователь: {user.Login}" + (user.IsAdministrator ? " (администратор)" : " (просмотр)");
         if (!user.IsAdministrator) { AddButton.Visibility = Visibility.Collapsed; EditButton.Visibility = Visibility.Collapsed; DeleteButton.Visibility = Visibility.Collapsed; CatalogButton.Visibility = Visibility.Collapsed; UsersButton.Visibility = Visibility.Collapsed; }
         Refresh();
+        ApplicationLogger.Info("MAIN: данные задач загружены в таблицу");
     }
 
     private void Refresh(TaskFilter? filter = null) => TasksGrid.ItemsSource = _service.Search(filter ?? TaskFilter.Empty).Select(task => new TaskRow(task)).ToList();
