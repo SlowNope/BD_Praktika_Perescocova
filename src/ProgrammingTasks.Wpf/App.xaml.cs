@@ -14,7 +14,16 @@ public partial class App : System.Windows.Application
         base.OnStartup(e);
         var login = new LoginWindow();
         if (login.ShowDialog() != true) { Shutdown(); return; }
-        new MainWindow(login.User!).Show();
+        try
+        {
+            MainWindow = new MainWindow(login.User!);
+            MainWindow.Show();
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show($"Не удалось запустить главное окно:\n{exception.Message}", "Ошибка запуска", MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown();
+        }
     }
 }
 
