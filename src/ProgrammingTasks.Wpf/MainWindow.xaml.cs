@@ -57,6 +57,7 @@ public partial class MainWindow : Window
     private void DeleteClick(object sender, RoutedEventArgs e) { if (TasksGrid.SelectedItem is not TaskRow row) return; if (MessageBox.Show("Удалить выбранную задачу?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes) { _service.Delete(row.Task.Id); Refresh(); } }
     private void CatalogClick(object sender, RoutedEventArgs e) { var window = new CatalogWindow { Owner = this }; window.ShowDialog(); }
     private void UsersClick(object sender, RoutedEventArgs e) { var window = new UsersWindow { Owner = this }; window.ShowDialog(); }
+    private void TaskDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) { if (TasksGrid.SelectedItem is TaskRow row) new TaskDetailsWindow(row.Task) { Owner = this }.ShowDialog(); }
 
     private sealed class TaskRow
     {
